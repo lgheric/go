@@ -1,0 +1,28 @@
+[mysql]
+host = "192.168.1.115"
+port = "3306"
+user = "dbuser"
+pswd = "123456"
+charset = "utf8"
+database = "aums"
+
+[log]
+file = "./log/log.log"
+
+[redis]
+host = "192.168.1.115"
+port = "6379"
+pswd = ""
+startq = "hammer_start_list_"
+endq = "hammer_end_list_"
+scene = "hammer_scene_"
+dealerlock = "hammer_dealer_lock_"
+orderlock = "hammer_order_lock_"
+cardlock = "hammer_order_card"
+timeout = 60
+
+[fee]
+percentage = 0.01
+minfee = 300
+maxfee = 2000
+

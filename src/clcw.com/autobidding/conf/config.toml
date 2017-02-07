@@ -1,0 +1,30 @@
+[mysql]
+host = "192.168.1.115"
+port = "3306"
+user = "dbuser"
+pswd = "123456"
+charset = "utf8mb4"
+database = "aums"
+
+[log]
+debug = 1
+file = "./log/log.log"
+
+[redis]
+host = "192.168.1.115"
+port = "6379"
+pswd = ""
+database = "4"
+orderinfo = "autobidding_order_info_"
+orderlist = "autobidding_order_list"
+dealerlist = "autobidding_dealer_list_"
+orderbidding = "autobidding_order_bidding_"
+dealerinfo = "autobidding_dealer_info_"
+timeout = 60
+
+[thrift]
+biddinghost = "http://auction.weaver.clcw.com.cn:80/Auction/run"
+
+[bidding]
+addPrice = 300
+
