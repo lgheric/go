@@ -6,6 +6,9 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"time"
+
+	"database/sql"
+	"os/exec"
 )
 
 // 处理开始时间的队列
@@ -20,7 +23,7 @@ func orderStartService() {
 		queueName := conf.Redis.Startq + fmt.Sprintf("%d", now)
 		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
 		if err != nil {
-			log.Fatal("%s queue exists failed: %s ", queueName, err)
+			log.Fatalf("%s queue exists failed: %s ", queueName, err)
 		}
 		if keyExists {
 			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
@@ -31,79 +34,12 @@ func orderStartService() {
 	}
 
 }
-
-// 处理传入参数时间
-func orderStartServiceByTime(startTime int64) {
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	for i := startTime; startTime < 2147443200; i++ {
-		queueName := conf.Redis.Startq + fmt.Sprintf("%d", i)
-		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
-		if err != nil {
-			log.Fatal("%s queue exists failed: %s ", queueName, err)
-		}
-		if keyExists {
-			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
-			res, _ := redis.String(conn.Do("RPOP", queueName))
-			fmt.Printf("%s queue pop %s \n", queueName, res)
-			go orderStartHandle(res)
-		}
-	}
-}
-
-// 处理结束时间的队列
-func orderEndService() {
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	for {
-		now := time.Now().Unix()
-		// now = 1477561980
-		queueName := conf.Redis.Endq + fmt.Sprintf("%d", now)
-		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
-		if err != nil {
-			log.Fatal("%s queue exists failed: %s ", queueName, err)
-		}
-		if keyExists {
-			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
-			res, _ := redis.String(conn.Do("RPOP", queueName))
-			fmt.Printf("%s queue pop %s \n", queueName, res)
-			go orderEndHandle(res)
-		}
-	}
-
-}
-
-// 处理传入参数时间
-func orderEndServiceByTime(startTime int64) {
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	for i := startTime; startTime < 2147443200; i++ {
-		queueName := conf.Redis.Endq + fmt.Sprintf("%d", i)
-		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
-		if err != nil {
-			log.Fatal("%s queue exists failed: %s ", queueName, err)
-		}
-		if keyExists {
-			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
-			res, _ := redis.String(conn.Do("RPOP", queueName))
-			fmt.Printf("%s queue pop %s \n", queueName, res)
-			go orderEndHandle(res)
-		}
-	}
-}
-
-//订单开始处理
+//开始处理单个开始拍单
 func orderStartHandle(res string) {
 	order := &StartOrderQueue{}
 	err := json.Unmarshal([]byte(res), &order)
 	if err != nil {
-		log.Fatal("json %s failed: %v \n", res, err)
+		log.Fatalf("json",res,"解析失败", err)
 	}
 
 	if order.SceneID == 0 || order.OrderID == 0 {
@@ -114,7 +50,12 @@ func orderStartHandle(res string) {
 	conn := pool.Get()
 	defer conn.Close()
 
+	//获取场redis key
 	count, err := redis.Int(conn.Do("SCARD", conf.Redis.Scene+fmt.Sprintf("%d", order.SceneID)))
+	if err != nil {
+		log.Fatalf("json %s failed: %v \n", err)
+	}
+
 	fmt.Printf("scene_id : %d scard : %d \n", order.SceneID, count)
 	if count <= 0 {
 		oids := getOrderList(order.SceneID)
@@ -123,7 +64,7 @@ func orderStartHandle(res string) {
 			orderWaitBidding(oids, order.SceneID)
 			sceneSaddOrder(oids, order.SceneID)
 		} else {
-			fmt.Println("%d 会场没有status = 3订单", order.SceneID)
+			fmt.Printf("%d 会场没有status = 3订单", order.SceneID)
 			return
 		}
 	}
@@ -139,12 +80,37 @@ func orderStartHandle(res string) {
 	fmt.Printf("StartOrderQueue %s : scene_id : %d | order_id : %d \n", queueName, order.SceneID, order.OrderID)
 }
 
-//订单结束处理
+// 处理结束时间的队列
+func orderEndService() {
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	for {
+		now := time.Now().Unix()
+		// now = 1477561980
+		queueName := conf.Redis.Endq + fmt.Sprintf("%d", now)
+		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
+		if err != nil {
+			log.Fatalf("%s queue exists failed: %s ", queueName, err)
+		}
+		if keyExists {
+			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
+			res, _ := redis.String(conn.Do("RPOP", queueName))
+			fmt.Printf("%s queue pop %s \n", queueName, res)
+			go orderEndHandle(res)
+		}
+	}
+
+}
+
+
+//开始处理单个结束拍单
 func orderEndHandle(res string) {
 	eod := &EndOrderQueue{}
 	err := json.Unmarshal([]byte(res), &eod)
 	if err != nil {
-		log.Fatal("json %s failed: %v \n", res, err)
+		log.Fatalf("json %s failed: %v \n", res, err)
 	}
 
 	order := getOrder(eod.OrderID)
@@ -176,13 +142,52 @@ func orderEndHandle(res string) {
 			if !keyExists {
 				sceneEnd(order.SceneId)
 			}
-			// 违约重拍
-			breachRedo(order.OrderId)
-
 		}
 	}
 
 }
+// 处理指定时间段开拍的拍单
+func orderStartServiceByTime(startTime int64) {
+
+	conn := pool.Get()
+	defer conn.Close()
+	for i := startTime; startTime < 2147443200; i++ {
+		queueName := conf.Redis.Startq + fmt.Sprintf("%d", i)
+		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
+		if err != nil {
+			log.Fatalf("%s queue exists failed: %s ", queueName, err)
+		}
+		if keyExists {
+			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
+			res, _ := redis.String(conn.Do("RPOP", queueName))
+			fmt.Printf("%s queue pop %s \n", queueName, res)
+			//go orderStartHandle(res)
+		}
+	}
+}
+
+// 处理指定时间段结束的拍单
+func orderEndServiceByTime(startTime int64) {
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	for i := startTime; startTime < 2147443200; i++ {
+		queueName := conf.Redis.Endq + fmt.Sprintf("%d", i)
+		keyExists, err := redis.Bool(conn.Do("EXISTS", queueName))
+		if err != nil {
+			log.Fatalf("%s queue exists failed: %s ", queueName, err)
+		}
+		if keyExists {
+			// 这里速度太快会全部取掉，就会异常（ redigo: nil returned）。忽略掉这个异常
+			res, _ := redis.String(conn.Do("RPOP", queueName))
+			fmt.Printf("%s queue pop %s \n", queueName, res)
+			go orderEndHandle(res)
+		}
+	}
+}
+
+
 
 //处理订单
 func orderStart(oid int) {
@@ -197,12 +202,12 @@ func orderStart(oid int) {
 
 	// 可能无人投标出价
 	//if err != nil {
-	//	log.Fatal("in order line 218 mysql fetch result failed: %v ", err)
+	//	log.Fatalf("in order line 218 mysql fetch result failed: %v ", err)
 	//}
 
 	tx, err := db.Begin()
 	if err != nil {
-		log.Fatal("order start mysql transaction begin failed: %v ", err)
+		log.Fatalf("order start mysql transaction begin failed: %v ", err)
 	}
 	defer tx.Rollback()
 
@@ -212,13 +217,12 @@ func orderStart(oid int) {
 	//rowCnt, err := result.RowsAffected()
 	//fmt.Println(rowCnt)
 	//if err != nil {
-	//	log.Fatal(err)
+	//	log.Fatalf(err)
 	//}
 
 	if dealerID > 0 {
 		paimaiRefund(oid, dealerID)
 		fmt.Printf("订单 %d 解冻投标阶段的保证金 \n", oid)
-
 	} else {
 		fmt.Printf("订单：%d 无人投标 \n", oid)
 	}
@@ -235,7 +239,7 @@ func orderStart(oid int) {
 
 	errc := tx.Commit()
 	if errc != nil {
-		log.Fatal("order start mysql transaction commit failed: %v ", errc)
+		log.Fatalf("order start mysql transaction commit failed: %v ", errc)
 	}
 
 	if order.IsTimingOrder {
@@ -258,7 +262,7 @@ func orderEnd(od order) {
 		if lockBool {
 			tx, err := db.Begin()
 			if err != nil {
-				log.Fatal("order end mysql transaction begin failed: %v ", err)
+				log.Fatalf("order end mysql transaction begin failed: %v ", err)
 			}
 			defer tx.Rollback()
 
@@ -299,7 +303,7 @@ func orderEnd(od order) {
 
 			errc := tx.Commit()
 			if errc != nil {
-				log.Fatal("order start mysql transaction commit failed: %v ", errc)
+				log.Fatalf("order start mysql transaction commit failed: %v ", errc)
 			}
 
 			if od.IsTimingOrder {
@@ -316,8 +320,28 @@ func orderEnd(od order) {
 	}
 
 }
+//处理违约重拍 -- 到平台确认
+func breachRedoPlatform(oid int){
+	//global $db;
+	//$order = $db->where('order_id', $id)->getOne('order');
+	//$car = $db->where('car_id', $order['car_id'])->getOne('cars');
+	////拍单是否违约重拍
+	//if ($car['is_dealer_breach'] == 1) {
+	//	echo $order['order_id'] . " - " . $order['order_no'] . "违约重拍处理\n";
+	//	$old_order = $db->rawQueryOne("SELECT * FROM `au_order` WHERE `car_id`='{$order['car_id']}' ORDER BY order_id DESC limit 1,1");
+	//	$best_price = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_price'] : $order['bid_best_price'];
+	//	$success_dealer_id = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_dealer_id'] : $order['bid_best_dealer_id'];
+	//	$data = [];
+	//	$data['status'] = 5;
+	//	$data['success_price'] = $best_price;
+	//	$data['success_dealer_id'] = $success_dealer_id;
+	//	$data['first_money'] = $old_order['first_money'];
+	//	$data['confirm_type'] = 1;
+	//	$db->where('order_id', $id)->update('order', $data);
+	//}
+}
 
-//违约重拍
+//违约重拍处理
 func breachRedo(oid int) {
 
 	var (
@@ -347,7 +371,7 @@ func breachRedo(oid int) {
 
 		tx, err := db.Begin()
 		if err != nil {
-			log.Fatal("breachRedo mysql transaction begin failed: %v ", err)
+			log.Fatalf("breachRedo mysql transaction begin failed: %v ", err)
 		}
 		defer tx.Rollback()
 
@@ -360,28 +384,15 @@ func breachRedo(oid int) {
 				firstPayStatus = 0
 			}
 
-			if car.DeliveryMode == 1 {
-				// 先付款后验车
-				stmt, _ := tx.Prepare("INSERT INTO `au_proceeds_log` SET `order_id` = ?, `createtime` = '?'")
-				stmt.Exec(oid, now)
+			// 先付款后验车
+			stmt, _ := tx.Prepare("INSERT INTO `au_proceeds_log` SET `order_id` = ?, `createtime` = '?'")
+			stmt.Exec(oid, now)
 
-				stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `return_check_status` = ?, " +
-					" `first_money` = ?, `first_pay_status` = ?  WHERE `order_id` = ?")
-				stmti.Exec(8, bestPrice, successDealerId, 5, oldOrder.FirstMoney, firstPayStatus, oid)
+			stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `return_check_status` = ?, " +
+				" `first_money` = ?, `first_pay_status` = ?  WHERE `order_id` = ?")
+			stmti.Exec(8, bestPrice, successDealerId, 5, oldOrder.FirstMoney, firstPayStatus, oid)
 
-			} else {
-				// 先验车后付款
-				checkCarStatus := 1
-				limitTime := time.Now().AddDate(0, 0, 1).Format("2006-01-02 15:04:05")
 
-				stmt, _ := tx.Prepare("INSERT INTO `au_car_dealer_check` SET `dealer_id` = ?, `createtime` = '?', `check_limit_time` = '?' ")
-				stmt.Exec(oid, now, limitTime)
-
-				stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `return_check_status` = ?, " +
-					" `first_money` = ?, `first_pay_status` = ?, `check_car_status` = ?  WHERE `order_id` = ?")
-				stmti.Exec(8, bestPrice, successDealerId, 5, oldOrder.FirstMoney, firstPayStatus, checkCarStatus, oid)
-
-			}
 			// 个人车源
 		} else {
 
@@ -408,30 +419,19 @@ func breachRedo(oid int) {
 					tailMoney = oldPrice
 				}
 			}
-			if car.DeliveryMode == 1 {
-				stmt, _ := tx.Prepare("INSERT INTO `au_proceeds_log` SET `order_id` = ?, `createtime` = '?'")
-				stmt.Exec(oid, now)
 
-				stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `tail_money` = ?, " +
-					" `first_money` = ?, `first_pay_status` = ?  WHERE `order_id` = ?")
-				stmti.Exec(8, bestPrice, successDealerId, tailMoney, oldOrder.FirstMoney, firstPayStatus, oid)
+			stmt, _ := tx.Prepare("INSERT INTO `au_proceeds_log` SET `order_id` = ?, `createtime` = '?'")
+			stmt.Exec(oid, now)
 
-			} else {
-				checkCarStatus := 1
-				limitTime := time.Now().AddDate(0, 0, 1).Format("2006-01-02 15:04:05")
+			stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `tail_money` = ?, " +
+				" `first_money` = ?, `first_pay_status` = ?  WHERE `order_id` = ?")
+			stmti.Exec(8, bestPrice, successDealerId, tailMoney, oldOrder.FirstMoney, firstPayStatus, oid)
 
-				stmt, _ := tx.Prepare("INSERT INTO `au_car_dealer_check` SET `dealer_id` = ?, `createtime` = '?', `check_limit_time` = '?' ")
-				stmt.Exec(oid, now, limitTime)
-
-				stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `tail_money` = ?, " +
-					" `first_money` = ?, `first_pay_status` = ?, `check_car_status` = ?  WHERE `order_id` = ?")
-				stmti.Exec(8, bestPrice, successDealerId, tailMoney, oldOrder.FirstMoney, firstPayStatus, checkCarStatus, oid)
-			}
 		}
 
 		errc := tx.Commit()
 		if errc != nil {
-			log.Fatal("breachRedo mysql transaction commit failed: %v ", errc)
+			log.Fatalf("breachRedo mysql transaction commit failed: %v ", errc)
 		}
 
 		// 违约重拍这里发券
@@ -456,4 +456,153 @@ func breachRedo(oid int) {
 
 	}
 
+}
+
+//处理自收重拍
+func SelfReceiveRedo(id int){
+	//global $db;
+	//$order = $db->where('order_id', $id)->getOne('order');
+	//$car = $db->where('car_id', $order['car_id'])->getOne('cars');
+	////拍单是否自收重拍
+	//$success_dealer_id = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_dealer_id'] : $order['bid_best_dealer_id'];
+	//if ($car['is_self_receive'] == 1) {
+	//echo $order['order_id'] . " - " . $order['order_no'] . "自收重拍处理\n";
+	//$best_price = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_price'] : $order['bid_best_price'];
+	////判断车辆来源
+	//$data = [];
+	//$data['status'] = 5;
+	//$data['success_price'] = $best_price;
+	//$data['success_dealer_id'] = $success_dealer_id;
+	//$data['confirm_type'] = 1;
+	//$db->where('order_id', $id)->update('order', $data);
+	//} else {
+	////自收人拍得非违约重拍的车辆，才打上自收标签
+	//if ($car['is_dealer_breach'] == 0) {
+	//echo $order['order_id'] . " - " . $order['order_no'] . "自收人拍得车辆处理\n";
+	//$dealer = $db->where('dealer_id', $success_dealer_id)->getOne('car_dealer', 'dealer_type');
+	//if ($dealer['dealer_type'] == 1) {
+	//$db->where('car_id', $order['car_id'])->update('cars', [
+	//'is_self_receive' => 1,
+	//'self_receive_dealer_id' => $success_dealer_id
+	//]);
+	//}
+	//}
+	//}
+}
+
+func update_trace_log(orderId int){
+
+	stmt := "SELECT `car_id` FROM `au_order` WHERE `order_id` = ? LIMIT 1"
+	rows := db.QueryRow(stmt,orderId)
+	var car_id int
+	err := rows.Scan(&car_id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("找不到车源 car_id:",car_id)
+		} else {
+			log.Fatalf("SELECT `car_id` FROM `au_order` WHERE `order_id` = %d exec failed: %v ", orderId,err)
+		}
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatalf("update_trace_log mysql transaction begin failed: %v ", err)
+	}
+	defer tx.Rollback()
+
+	stmtl, _ := tx.Prepare("INSERT INTO `au_order_trace_log_list`(`order_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
+	stmtl.Exec(orderId, order.CarId, "--", 1007, "开始竞拍", time.Now().UnixNano())
+
+
+	//$now = microtime_time();
+	//$orderInfo = $db->where('order_id', $id)->getOne('order','car_id');
+	//$db->insert('order_trace_log_list',[
+	//'order_id' => $id,
+	//'car_id'   => $orderInfo['car_id'],
+	//'emp_name' => '--',
+	//'action_no' => 1008,
+	//'action_name' => '竞拍结束',
+	//'createtime' => $now
+	//]);
+	//$carInfo = $db->where('car_id', $orderInfo['car_id'])->getOne('cars','owner_id,sid');
+	//$db->insert('car_trace_log_list',[
+	//'owner_id'   => $carInfo['owner_id'],
+	//'car_id' => $orderInfo['car_id'],
+	//'emp_name' => '--',
+	//'action_no' => 1014,
+	//'action_name' => '竞拍结束',
+	//'createtime' =>$now
+	//]);
+
+}
+
+//更新车源状态
+func update_car_source(sid int){
+
+	stmt := "SELECT `status` FROM `au_car_source` WHERE `sid` = ? LIMIT 1"
+	rows := db.QueryRow(stmt, sid)
+
+	var status int
+	err := rows.Scan(&status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("找不到车源sid:",sid)
+		} else {
+			log.Fatalf("select status from  au_car_source where sid= %d 543 mysql fetch result failed: %v ", sid,err)
+		}
+	}
+
+	if status == 200 {
+		stmt = "UPDATE `au_car_source` SET `status` = 300 WHERE `sid` = ?"
+		_, err := db.Exec(stmt, sid)
+		if err != nil {
+			log.Printf("UPDATE `au_car_source` SET `status` = 300 WHERE `sid` = %d exec failed: %v \n", sid,err)
+		}
+		fmt.Printf("更新车源 %d 状态为300 待确认\n", sid)
+	}
+}
+func del_autobidding_redis_key(orderId int){
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	if _, err := conn.Do("SELECT", 4); err != nil {
+		log.Fatalf("Redis 选择库失败。Err:  %s ", err)
+		return
+	}
+	//autobidding_order_list
+	queueName := conf.Redis.AutoOrderLs + string(orderId)
+	_, err := redis.String(conn.Do("srem", queueName))
+	if err != nil {
+		fmt.Printf("%s queue srem failed: %s ", queueName, err)
+	}
+
+	//删除所有设置智能出价的车商
+	//autobidding_dealer_list_拍单ID
+	queueName = conf.Redis.AutoDealerLs + string(orderId)
+	_, err = redis.String(conn.Do("del", queueName))
+	if err != nil {
+		fmt.Printf("%s queue del failed: %s ", queueName, err)
+	}
+
+	//autobidding_dealer_info_拍单ID_*
+	queueName = conf.Redis.AutoDealerIf + string(orderId)+"_*"
+	cmd := exec.Command("`which sh`", "-c", "`redis-cli keys"+ queueName +"|xargs redis-cli del`")
+	_, err = cmd.StdoutPipe()
+	if err != nil {
+		fmt.Println(queueName,"删除失败。","错误: " + err.Error())
+	}
+
+	//autobidding_order_info_拍单ID
+	queueName = conf.Redis.AutoOrderIf + string(orderId)
+	_, err = redis.String(conn.Do("del", queueName))
+	if err != nil {
+		fmt.Printf("%s queue del failed: %s ", queueName, err)
+	}
+	//autobidding_order_bidding_拍单ID
+	queueName = conf.Redis.AutoOrderBi + string(orderId)
+	_, err = redis.String(conn.Do("del", queueName))
+	if err != nil {
+		fmt.Printf("%s queue del failed: %s ", queueName, err)
+	}
 }

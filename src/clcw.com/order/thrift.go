@@ -11,18 +11,18 @@ import (
 
 func thriftClient() {
 	startTime := currentTimeMillis()
-	url := "http://192.168.59.88:80/Bail/run"
+	url := "http://192.168.1.115:80/Bail/run"
 
 	transport, err := thrift.NewTHttpPostClient(url)
 	if err != nil {
-		log.Fatal("Error thrift 18 opening http failed: %v", err)
+		log.Fatalf("Error thrift 18 opening http failed: %v", err)
 	}
 
 	var protocol thrift.TProtocol = thrift.NewTBinaryProtocolTransport(transport)
 	protocol = thrift.NewTMultiplexedProtocol(protocol, "BailService")
 	client := bail.NewBailServiceClientProtocol(transport, protocol, protocol)
 	if err := transport.Open(); err != nil {
-		log.Fatal("Error thrift 25 opening transport failed: %v", err)
+		log.Fatalf("Error thrift 25 opening transport failed: %v", err)
 	}
 	defer client.Transport.Close()
 

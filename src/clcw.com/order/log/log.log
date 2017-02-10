@@ -3,3 +3,402 @@
 2017/02/06 19:45:21 [CLCW Order SERVER] Biz Init Finished.
 2017/02/06 20:11:00 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
 2017/02/06 20:11:00 [CLCW Order SERVER] Biz Init Finished.
+2017/02/07 17:46:56 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/07 17:46:56 [CLCW Order SERVER] Biz Init Finished.
+2017/02/07 17:50:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/07 17:50:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/07 18:03:54 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/07 18:03:54 [CLCW Order SERVER] Biz Init Finished.
+2017/02/07 18:04:22 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/07 18:04:22 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:15:54 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:15:54 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:25:33 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:25:33 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:25:48 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:25:48 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:25:51 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:25:51 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:25:54 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:25:54 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:25:57 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:25:57 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:26:59 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:26:59 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:27:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:27:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:27:52 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:27:52 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:30:16 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:30:16 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:30:46 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:30:46 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:31:09 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:31:09 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:31:36 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:31:36 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:31:36 %s queue exists failed: %s hammer_start_list_1486517496<nil>
+2017/02/08 09:33:29 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:33:29 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:34:09 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:34:09 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:35:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:35:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 09:57:06 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 09:57:06 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 10:36:40 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 10:36:40 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 10:45:00 json %s failed: %v 
+unexpected end of JSON input
+2017/02/08 10:45:23 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 10:45:23 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 11:05:12 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 11:05:12 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 11:10:00 json %s failed: %v 
+unexpected end of JSON input
+2017/02/08 11:12:56 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 11:12:56 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 11:15:00 json %s failed: %v 
+unexpected end of JSON input
+2017/02/08 11:15:59 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 11:15:59 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 11:18:20 json %s failed: %v 
+unexpected end of JSON input
+2017/02/08 13:30:45 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 13:30:46 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 13:35:00 44 <nil>
+2017/02/08 14:14:24 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 14:14:24 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 14:18:20 44 <nil>
+2017/02/08 14:20:12 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 14:20:12 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 14:22:11 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 14:22:11 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 14:22:30 44 <nil>
+2017/02/08 14:41:55 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 14:41:55 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 14:45:00 44 <nil>
+2017/02/08 14:46:15 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 14:46:15 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 14:46:40 44 <nil>
+2017/02/08 15:02:10 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:02:10 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:05:44 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:05:44 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:06:17 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:06:17 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:06:23 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:06:23 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:08:45 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:08:45 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:13:35 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:13:35 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:35:42 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:35:42 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:36:29 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:36:29 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:37:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:37:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:38:11 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:38:11 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:41:24 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:41:24 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:41:50 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:41:50 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:42:32 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:42:32 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:46:55 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:46:55 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 15:58:35 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 15:58:35 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 16:04:53 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 16:04:53 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 16:11:17 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 16:11:17 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 16:14:53 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 16:14:53 [CLCW Order SERVER] Biz Init Finished.
+2017/02/08 17:54:16 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/08 17:54:16 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 09:20:39 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 09:20:39 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 09:21:42 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 09:21:42 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 09:53:10 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 09:53:10 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 09:53:37 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 09:53:37 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 09:54:44 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 09:54:44 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 09:55:42 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 09:55:42 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:12:28 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:12:28 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:13:22 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:13:22 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:28:42 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:28:42 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:31:50 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:31:50 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:40:47 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:40:47 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:40:47 json %s failed: %v 
+&{[]} json: cannot unmarshal array into Go value of type main.StartOrderQueue2
+2017/02/09 10:41:41 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:41:41 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:44:26 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:44:26 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:48:21 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:48:21 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:50:48 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:50:48 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:52:06 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:52:06 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 10:57:31 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 10:57:31 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:08:43 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:08:43 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:08:43 %s :scene set error order %s : %v 2576 2674 <nil>
+2017/02/09 11:20:48 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:20:48 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:30:08 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:30:08 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:33:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:33:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:33:04 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:49:27 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:49:27 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:49:27 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:49:51 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:49:51 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:49:51 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:50:08 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:50:08 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:50:08 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:51:22 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:51:22 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:51:22 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:58:41 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:58:41 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:58:41 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:59:10 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:59:10 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:59:10 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:59:12 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:59:12 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:59:12 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:59:19 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:59:19 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:59:19 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 11:59:51 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 11:59:51 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 11:59:51 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 12:00:51 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 12:00:51 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 12:00:51 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 12:02:37 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 12:02:37 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 12:02:37 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 12:03:17 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 12:03:17 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 12:03:17 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 12:04:54 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 12:04:54 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 12:04:54 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 14:02:40 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:02:40 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:02:40 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 14:03:37 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:03:37 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:03:37 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 14:04:51 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:04:51 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:04:51 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 14:05:38 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:05:38 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:05:38 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 14:06:03 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:06:03 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:06:03 开始拍单队列解析失败： %v unexpected end of JSON input
+2017/02/09 14:07:47 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:07:47 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:07:47 %s 发生错误 %vhammer_end_list_1486609800ERR wrong number of arguments for 'lrange' command
+2017/02/09 14:08:31 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:08:31 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:08:31 %s 发生错误 %vhammer_end_list_1486609800ERR wrong number of arguments for 'lrange' command
+2017/02/09 14:09:50 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:09:50 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:09:50 %s 发生错误 %vhammer_end_list_1486609800redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:12:01 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:12:01 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:12:01 %s 发生错误 %vhammer_end_list_1486609800ERR wrong number of arguments for 'lrange' command
+2017/02/09 14:16:12 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:16:12 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:16:12 %s 发生错误 %vhammer_end_list_1486609800redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:17:43 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:17:43 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:17:43 %s 发生错误 %vhammer_end_list_1486609800redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:19:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:19:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:19:04 %s 发生错误 %vhammer_end_list_1486609800ERR unknown command 'LRANGE hammer_end_list_1486609800 0 6'
+2017/02/09 14:20:44 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:20:44 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:20:44 %s 发生错误 %vhammer_end_list_1486609800ERR Operation against a key holding the wrong kind of value
+2017/02/09 14:28:45 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:28:45 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:28:45 %s 发生错误 %vhammer_end_list_1486609800redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:29:33 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:29:33 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:30:10 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:30:10 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:30:36 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:30:36 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:32:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:32:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:32:21 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:32:21 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:32:47 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:32:47 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:39:04 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:39:04 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:39:04 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:41:40 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:41:40 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:41:40 发生错误：ERR Operation against a key holding the wrong kind of value
+2017/02/09 14:43:32 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:43:32 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:43:32 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:46:01 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:46:01 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:46:01 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:46:40 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:46:40 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:46:40 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:47:32 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:47:32 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:47:32 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:48:34 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:48:34 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:48:34 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:49:21 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:49:21 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:49:21 发生错误：<nil>
+2017/02/09 14:49:58 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:49:58 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:50:40 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:50:40 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:50:40 发生错误：ERR wrong number of arguments for 'lrange' command
+2017/02/09 14:51:01 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:51:01 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:51:01 发生错误：redigo: unexpected type for String, got type []interface {}
+2017/02/09 14:52:58 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:52:58 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:56:14 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:56:14 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:56:57 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:56:57 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:57:28 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:57:28 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 14:57:28 发生错误：ERR Operation against a key holding the wrong kind of value
+2017/02/09 14:58:10 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 14:58:10 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:11:20 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:11:20 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:12:38 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:12:38 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:14:54 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:14:54 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:16:52 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:16:52 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:30:33 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:30:33 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:37:16 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:37:16 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:38:08 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:38:08 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:38:38 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:38:38 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:38:45 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:38:45 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:39:03 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:39:03 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:39:12 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:39:12 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:41:36 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:41:36 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:47:08 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:47:08 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:47:56 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:47:56 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 15:52:57 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 15:52:57 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 16:19:32 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 16:19:32 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 16:28:42 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 16:28:42 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 16:39:29 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 16:39:29 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 16:46:55 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 16:46:55 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 16:47:11 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 16:47:11 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 16:47:52 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 16:47:52 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:00:03 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:00:03 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:04:11 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:04:11 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:08:24 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:08:24 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:10:29 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:10:29 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:15:00 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:15:00 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:15:09 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:15:09 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:15:39 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:15:39 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:16:13 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:16:13 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:16:18 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/09 17:16:18 [CLCW Order SERVER] Biz Init Finished.
+2017/02/09 17:30:00 json%!(EXTRA string=, string=解析失败, *json.SyntaxError=unexpected end of JSON input)
+2017/02/09 17:35:00 json  failed: unexpected end of JSON input 
+2017/02/09 18:00:00 %!s(int=2577) :scene set error order %!s(int=2677) : <nil> 
+2017/02/10 09:07:28 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:07:28 [CLCW Order SERVER] Biz Init Finished.
+2017/02/10 09:08:34 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:08:34 [CLCW Order SERVER] Biz Init Finished.
+2017/02/10 09:11:51 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:11:51 [CLCW Order SERVER] Biz Init Finished.
+2017/02/10 09:16:11 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:16:11 [CLCW Order SERVER] Biz Init Finished.
+2017/02/10 09:16:28 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:16:28 [CLCW Order SERVER] Biz Init Finished.
+2017/02/10 09:40:03 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:40:03 [CLCW Order SERVER] Biz Init Finished.
+运行参数:  start 0
+2017/02/10 09:40:13 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/10 09:40:13 [CLCW Order SERVER] Biz Init Finished.
+运行参数:  end 0
+hammer_start_list_1486691100 queue pop {"order_id":2686,"scene_id":2580,"bidding_start_time":"2017-02-10 09:45:00","bidding_end_time":"0000-00-00 00:00:00","est_elapsed_time":600,"act_elapsed_time":0,"rank":1,"is_timing_order":1} 
+scene_id : 2580 scard : 0 
+场次 2580 开始 
+|2580|:场内全部拍单列表:2686 
+订单：2686 无人投标 
+2580 : 定时拍单P1702100003竞拍中。。。。。。。。
+StartOrderQueue hammer_end_list_1486691700 : scene_id : 2580 | order_id : 2686 
+hammer_end_list_1486691700 queue pop {"order_id":2686,"scene_id":2580,"bidding_start_time":"2017-02-10 09:45:00","bidding_end_time":"0000-00-00 00:00:00","est_elapsed_time":600,"act_elapsed_time":0,"rank":1,"is_timing_order":1} 
+开始结束订单: 2686 
+2580 : 定时拍单P1702100003竞拍结束 
+场次 2580 结束 
+hammer_start_list_1486719180 queue pop {"order_id":2687,"scene_id":2582,"bidding_start_time":"2017-02-10 17:33:00","bidding_end_time":"0000-00-00 00:00:00","est_elapsed_time":3600,"act_elapsed_time":0,"rank":1,"is_timing_order":1} 
+scene_id : 2582 scard : 0 
+场次 2582 开始 
+|2582|:场内全部拍单列表:2687 
+订单：2687 无人投标 
+2582 : 定时拍单P1702100004竞拍中。。。。。。。。
+StartOrderQueue hammer_end_list_1486722780 : scene_id : 2582 | order_id : 2687 
+hammer_end_list_1486722780 queue pop {"order_id":2687,"scene_id":2582,"bidding_start_time":"2017-02-10 17:33:00","bidding_end_time":"0000-00-00 00:00:00","est_elapsed_time":3600,"act_elapsed_time":0,"rank":1,"is_timing_order":1} 
+开始结束订单: 2687 
+2582 : 定时拍单P1702100004竞拍结束 
+场次 2582 结束 

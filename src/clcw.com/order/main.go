@@ -29,14 +29,14 @@ const (
 func main() {
 
 	if _, err := toml.DecodeFile("./conf/config.toml", &conf); err != nil {
-		log.Fatal("[CLCW Order Server] toml decode conf err : %s", err.Error())
+		log.Fatalf("[CLCW Order Server] toml decode conf err : %s", err.Error())
 		return
 	}
 
 	//setup log
 	f, err := os.OpenFile(conf.Log.File, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatal("[CLCW Order SERVER] open log failed: %v", err)
+		log.Fatalf("[CLCW Order SERVER] open log failed: %v", err)
 	}
 	defer f.Close()
 	log.SetOutput(f)

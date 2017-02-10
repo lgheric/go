@@ -21,6 +21,11 @@ type redisConf struct {
 	Orderlock  string
 	Cardlock   string
 	Timeout    int
+	AutoOrderLs string
+	AutoOrderIf string
+	AutoOrderBi string
+	AutoDealerLs string
+	AutoDealerIf string
 }
 
 type logConf struct {

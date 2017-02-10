@@ -21,6 +21,14 @@ orderlock = "hammer_order_lock_"
 cardlock = "hammer_order_card"
 timeout = 60
 
+#智能报价redis队列
+autoOrderLs = "autobidding_order_list"
+autoOrderIf = "autobidding_order_info_"
+autoOrderBi = "autobidding_order_bidding_"
+
+autoDealerLs = "autobidding_dealer_list_"
+autoDealerIf = "autobidding_dealer_info_"
+
 [fee]
 percentage = 0.01
 minfee = 300

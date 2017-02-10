@@ -118,7 +118,7 @@ func exists(key string) (b bool, err error) {
 
 	b, err = redis.Bool(conn.Do("EXISTS", key))
 	if err != nil {
-		log.Fatal("%s queue exists failed: %s ", key, err)
+		log.Fatalf("%s queue exists failed: %s ", key, err)
 	}
 	return
 }
@@ -133,7 +133,7 @@ func redisLock(key string) (bool bool) {
 
 	bool, err := redis.Bool(conn.Do("SETNX", key, 1))
 	if err != nil {
-		log.Fatal("%s redis key lock failed: %v ", key, err)
+		log.Fatalf("%s redis key lock failed: %v ", key, err)
 	}
 
 	if !bool {
@@ -206,10 +206,10 @@ func sceneSaddOrder(oids []int, sid int) {
 	for _, v := range oids {
 		bool, err := redis.Bool(conn.Do("SADD", conf.Redis.Scene+fmt.Sprintf("%d", sid), v))
 		if err != nil {
-			log.Fatal("%s :scene set error order : %s %v ", sid, v, err)
+			log.Fatalf("%s :scene set error order : %s %v ", sid, v, err)
 		}
 		if !bool {
-			log.Fatal("%s :scene set error order %s : %v ", sid, v, err)
+			log.Fatalf("%s :scene set error order %s : %v ", sid, v, err)
 		}
 	}
 }
@@ -265,7 +265,7 @@ func getOrderList(sid int) (oids []int) {
 	for rows.Next() {
 		err := rows.Scan(&oid)
 		if err != nil {
-			log.Fatal("in util line 156 mysql fetch result failed: %v ", err)
+			log.Fatalf("in util line 156 mysql fetch result failed: %v ", err)
 		}
 		oids = append(oids, oid)
 	}
@@ -294,7 +294,7 @@ func getOrder(oid int) (od order) {
 		if err == sql.ErrNoRows {
 			log.Printf("%d can't find order", oid)
 		} else {
-			log.Fatal("getOrder 298 mysql fetch result failed: %v ", err)
+			log.Fatalf("getOrder 298 mysql fetch result failed: %v ", err)
 		}
 	}
 	return
@@ -315,7 +315,7 @@ func getCar(cid int) (car car) {
 		if err == sql.ErrNoRows {
 			log.Printf("%d can't find car", cid)
 		} else {
-			log.Fatal("getCar 320 mysql fetch result failed: %v ", err)
+			log.Fatalf("getCar 320 mysql fetch result failed: %v ", err)
 		}
 	}
 	return
@@ -343,7 +343,7 @@ func getOrderByCar(carId int) (od order) {
 		if err == sql.ErrNoRows {
 			log.Printf("%d can't find order", carId)
 		} else {
-			log.Fatal("getOrderByCar 349 mysql fetch result failed: %v ", err)
+			log.Fatalf("getOrderByCar 349 mysql fetch result failed: %v ", err)
 		}
 	}
 	return
@@ -373,7 +373,7 @@ func paimaiRefund(oid int, did int) {
 	for rows.Next() {
 		err := rows.Scan(&blId, &dealerId, &occurMoney)
 		if err != nil {
-			log.Fatal("mysql fetch result failed: %v ", err)
+			log.Fatalf("mysql fetch result failed: %v ", err)
 		}
 
 		dbl := new(dealerBailLog)
@@ -385,7 +385,7 @@ func paimaiRefund(oid int, did int) {
 		rows := db.QueryRow(stmt)
 		err = rows.Scan(&title)
 		if err != nil {
-			log.Fatal("mysql fetch result failed: %v ", err)
+			log.Fatalf("mysql fetch result failed: %v ", err)
 		}
 
 		updateGuarantee(oid, title, dbl)
@@ -408,7 +408,7 @@ func updateGuarantee(oid int, title string, dbl *dealerBailLog) (err error) {
 		if lockBool {
 			tx, err := db.Begin()
 			if err != nil {
-				log.Fatal("mysql transaction begin failed: %v ", err)
+				log.Fatalf("mysql transaction begin failed: %v ", err)
 			}
 			defer tx.Rollback()
 
@@ -417,7 +417,7 @@ func updateGuarantee(oid int, title string, dbl *dealerBailLog) (err error) {
 			rows := tx.QueryRow("SELECT `bail_amount` FROM `au_car_dealer` WHERE `dealer_id` = ?", dbl.dealerId)
 			err = rows.Scan(&bailAmount)
 			if err != nil {
-				log.Fatal("mysql fetch result failed: %v ", err)
+				log.Fatalf("mysql fetch result failed: %v ", err)
 			}
 
 			_, err = tx.Exec("UPDATE `au_car_dealer` SET shortname=shortname WHERE `dealer_id` = ? LIMIT 1", dbl.dealerId)
@@ -454,7 +454,7 @@ func getBranchId(cityCode int) (branchId int) {
 			log.Println("无所在分公司")
 			branchId = 0
 		} else {
-			log.Fatal("getBranchId 447 mysql fetch result failed: %v ", err)
+			log.Fatalf("getBranchId 447 mysql fetch result failed: %v ", err)
 		}
 	}
 	return
@@ -474,7 +474,7 @@ func isHaveActivity(now string, branchId int, activityType int) (aid int) {
 			log.Println("无活动")
 			aid = 0
 		} else {
-			log.Fatal("isHaveActivity 469 mysql fetch result failed: %v ", err)
+			log.Fatalf("isHaveActivity 469 mysql fetch result failed: %v ", err)
 		}
 	}
 	return
@@ -504,7 +504,7 @@ func getDenominationType(activityId int) (card map[int]float64) {
 	for rows.Next() {
 		err := rows.Scan(&num, &price)
 		if err != nil {
-			log.Fatal("getDenominationType 491 mysql fetch result failed: %v ", err)
+			log.Fatalf("getDenominationType 491 mysql fetch result failed: %v ", err)
 		}
 		card[num] = price
 	}
@@ -585,7 +585,7 @@ func getCard(price float64, aid int) (cid int) {
 			log.Println("can't find coupon")
 			aid = 0
 		} else {
-			log.Fatal("getCard 570 mysql fetch result failed: %v ", err)
+			log.Fatalf("getCard 570 mysql fetch result failed: %v ", err)
 		}
 	}
 	return
