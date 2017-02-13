@@ -308,9 +308,9 @@ func getOrder(oid int) (od order) {
  */
 func getCar(cid int) (car car) {
 
-	stmt := "SELECT car_id,car_no,owner_id,is_dealer_breach,car_source,pay_status,delivery_mode,three_in_one,location_area FROM au_cars WHERE car_id = ? "
+	stmt := "SELECT car_id,car_no,sid,sno,owner_id,is_dealer_breach,car_source,pay_status,delivery_mode,three_in_one,location_area FROM au_cars WHERE car_id = ? "
 	rows := db.QueryRow(stmt, cid)
-	err := rows.Scan(&car.CarId, &car.CarNo, &car.OwnerId, &car.IsDealerBreach, &car.CarSource, &car.PayStatus, &car.DeliveryMode, &car.ThreeInOne, &car.LocationArea)
+	err := rows.Scan(&car.CarId, &car.CarNo,&car.Sid,&car.Sno,&car.OwnerId, &car.IsDealerBreach, &car.CarSource, &car.PayStatus, &car.DeliveryMode, &car.ThreeInOne, &car.LocationArea)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Printf("%d can't find car", cid)

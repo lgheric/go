@@ -276,7 +276,7 @@ func orderEnd(od order) {
 				//保证金
 				paimaiRefund(od.OrderId, od.BidBestDealerId)
 
-				//更新服务费
+				//更新交易服务费
 				commision := getCommision(od.BidBestPrice)
 				stmt, _ := tx.Prepare("UPDATE `au_order` SET `success_price` = ?, `success_dealer_id` = ?, `commision` = ? WHERE `order_id` = ?")
 				stmt.Exec(od.BidBestPrice, od.BidBestDealerId, commision, od.OrderId)
@@ -287,19 +287,27 @@ func orderEnd(od order) {
 				//保证金
 				paimaiRefund(od.OrderId, od.BiddingBestDealerId)
 
-				//更新服务费
+				//更新交易服务费
 				commision := getCommision(od.BiddingBestPrice)
 				stmt, _ := tx.Prepare("UPDATE `au_order` SET `success_price` = ?, `success_dealer_id` = ?, `commision` = ? WHERE `order_id` = ?")
 				stmt.Exec(od.BiddingBestPrice, od.BiddingBestDealerId, commision, od.OrderId)
 			}
-
-			stmtl, _ := tx.Prepare("INSERT INTO `au_order_trace_log_list`(`order_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
-			stmtl.Exec(od.OrderId, od.CarId, "--", 1008, "竞拍结束", time.Now().UnixNano())
-
 			car := getCar(od.CarId)
 
-			stmtc, _ := tx.Prepare("INSERT INTO `au_car_trace_log_list`(`owner_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
-			stmtc.Exec(car.OwnerId, car.CarId, "--", 1014, "竞拍结束", time.Now().UnixNano())
+			//更新拍单进度状态
+			updateTraceLog(od,car,tx)
+
+			//更新车源为待确认
+			updateCarSource(car,tx)
+
+			//处理违约重拍 -- 到平台确认
+			breachRedoPlatform(od.OrderId,tx)
+
+			//处理自收重拍
+			SelfReceiveRedo(od,car,tx)
+
+			//TODO 稍后修改下运营平台，auction 给redis加上2天有效期，之后此处代码删除
+			//cleanAutobidding(od.OrderId)
 
 			errc := tx.Commit()
 			if errc != nil {
@@ -320,248 +328,160 @@ func orderEnd(od order) {
 	}
 
 }
-//处理违约重拍 -- 到平台确认
-func breachRedoPlatform(oid int){
-	//global $db;
-	//$order = $db->where('order_id', $id)->getOne('order');
-	//$car = $db->where('car_id', $order['car_id'])->getOne('cars');
-	////拍单是否违约重拍
-	//if ($car['is_dealer_breach'] == 1) {
-	//	echo $order['order_id'] . " - " . $order['order_no'] . "违约重拍处理\n";
-	//	$old_order = $db->rawQueryOne("SELECT * FROM `au_order` WHERE `car_id`='{$order['car_id']}' ORDER BY order_id DESC limit 1,1");
-	//	$best_price = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_price'] : $order['bid_best_price'];
-	//	$success_dealer_id = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_dealer_id'] : $order['bid_best_dealer_id'];
-	//	$data = [];
-	//	$data['status'] = 5;
-	//	$data['success_price'] = $best_price;
-	//	$data['success_dealer_id'] = $success_dealer_id;
-	//	$data['first_money'] = $old_order['first_money'];
-	//	$data['confirm_type'] = 1;
-	//	$db->where('order_id', $id)->update('order', $data);
-	//}
+//更新拍单进度状态
+func updateTraceLog(od order,car car,tx *sql.Tx){
+
+	stmtl, _ := tx.Prepare("INSERT INTO `au_order_trace_log_list`(`order_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
+	stmtl.Exec(od.OrderId, od.CarId, "--", 1008, "竞拍结束", time.Now().UnixNano())
+
+	stmtc, _ := tx.Prepare("INSERT INTO `au_car_trace_log_list`(`owner_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
+	stmtc.Exec(car.OwnerId, car.CarId, "--", 1014, "竞拍结束", time.Now().UnixNano())
+
 }
 
-//违约重拍处理
-func breachRedo(oid int) {
+//更新车源状态
+func updateCarSource(car car,tx *sql.Tx) {
 
-	var (
-		bestPrice       float64
-		successDealerId int
-		firstPayStatus  int
-		tailMoney       float64
-	)
+	stmt := "SELECT `status` FROM `au_car_source` WHERE `sid` = ? LIMIT 1"
+	rows := db.QueryRow(stmt, car.Sid)
 
-	order := getOrder(oid)
-	car := getCar(order.CarId)
-
-	// 违约重拍
-	if car.IsDealerBreach {
-		fmt.Printf("%d - %s 违约重拍处理\n", order.OrderId, order.OrderNo)
-		oldOrder := getOrderByCar(order.CarId)
-
-		if order.BiddingBestPrice > order.BidBestPrice {
-			bestPrice = order.BiddingBestPrice
-			successDealerId = order.BiddingBestDealerId
+	var status int
+	err := rows.Scan(&status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("找不到车源sid:",car.Sid)
 		} else {
-			bestPrice = order.BidBestPrice
-			successDealerId = order.BidBestDealerId
+			log.Printf("select status from  au_car_source where sid= %d 543 mysql fetch result failed: %v ", car.Sid,err)
 		}
+	}
 
-		now := time.Now().Format("2006-01-02 15:04:05")
+	if status == 200 {
+		stmt, _ := tx.Prepare("UPDATE `au_car_source` SET `status` = 300 WHERE `sid` = ?")
+		stmt.Exec(car.Sid)
 
-		tx, err := db.Begin()
-		if err != nil {
-			log.Fatalf("breachRedo mysql transaction begin failed: %v ", err)
-		}
-		defer tx.Rollback()
-
-		// 判断车辆来源 4S店车源
-		if car.CarSource == 1 {
-
-			if car.PayStatus == 2 {
-				firstPayStatus = 1
-			} else {
-				firstPayStatus = 0
-			}
-
-			// 先付款后验车
-			stmt, _ := tx.Prepare("INSERT INTO `au_proceeds_log` SET `order_id` = ?, `createtime` = '?'")
-			stmt.Exec(oid, now)
-
-			stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `return_check_status` = ?, " +
-				" `first_money` = ?, `first_pay_status` = ?  WHERE `order_id` = ?")
-			stmti.Exec(8, bestPrice, successDealerId, 5, oldOrder.FirstMoney, firstPayStatus, oid)
-
-
-			// 个人车源
-		} else {
-
-			oldPrice := oldOrder.SuccessPrice + oldOrder.CompanySubsidies
-			if car.ThreeInOne == 1 {
-				if car.PayStatus > 1 {
-					firstPayStatus = 1
-				} else {
-					firstPayStatus = 0
-				}
-
-				if bestPrice > oldPrice {
-					tailMoney = oldOrder.TailMoney + (bestPrice - oldPrice)
-				} else {
-					tailMoney = oldOrder.TailMoney
-				}
-
-			} else {
-				firstPayStatus = 1
-
-				if bestPrice > oldPrice {
-					tailMoney = bestPrice
-				} else {
-					tailMoney = oldPrice
-				}
-			}
-
-			stmt, _ := tx.Prepare("INSERT INTO `au_proceeds_log` SET `order_id` = ?, `createtime` = '?'")
-			stmt.Exec(oid, now)
-
-			stmti, _ := tx.Prepare("UPDATE `au_order` SET `status` = ?, `success_price` = ?, `success_dealer_id` = ?, `tail_money` = ?, " +
-				" `first_money` = ?, `first_pay_status` = ?  WHERE `order_id` = ?")
-			stmti.Exec(8, bestPrice, successDealerId, tailMoney, oldOrder.FirstMoney, firstPayStatus, oid)
-
-		}
-
-		errc := tx.Commit()
-		if errc != nil {
-			log.Fatalf("breachRedo mysql transaction commit failed: %v ", errc)
-		}
-
-		// 违约重拍这里发券
-		var (
-			branchId   int
-			activityId int
-		)
-
-		branchId = getBranchId(car.LocationArea)
-
-		// 发放抽奖卡券
-		activityId = isHaveActivity(now, branchId, 1)
-		if activityId > 0 {
-			sendCard(oid, activityId)
-		}
-
-		// 发放抽代金券卡券
-		activityId = isHaveActivity(now, branchId, 2)
-		if activityId > 0 {
-			sendCard(oid, activityId)
-		}
-
+		fmt.Printf("更新车源 %d 状态为300 待确认\n", car.Sid)
 	}
 
 }
 
+//处理违约重拍 -- 到平台确认
+func breachRedoPlatform(oid int,tx *sql.Tx){
+	stmt := "SELECT * FROM au_order WHERE order_id= ? "
+	row := db.QueryRow(stmt,oid)
+	var (
+		orderNo string
+		carId int
+
+		isDealerBreach int
+
+		biddingBestPrice float64
+		biddingBestDealerId int
+
+		bidBestPrice float64
+		bidBestDealerId int
+
+		firstMoney float64
+
+		bestPrice float64
+		successDealerId int
+	)
+
+	err := row.Scan(&orderNo,&carId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("找不到拍单 order_id:",oid)
+		} else {
+			log.Fatalf("SELECT * FROM `au_order` WHERE `order_id` = %d exec failed: %v ", oid,err)
+		}
+	}
+
+	stmt = "SELECT * FROM au_cars WHERE car_id= ? "
+	row = db.QueryRow(stmt,carId)
+	err = row.Scan(&isDealerBreach)
+	if err != nil {
+		if err == sql.ErrNoRows{
+			log.Println("找不到拍单 car_id:",carId)
+		}else{
+			log.Printf("SELECT * FROM `au_cars` WHERE `car_id` = %d exec failed: %v ", carId,err)
+		}
+	}
+
+	if isDealerBreach == 1{
+		log.Println(oid,"-",orderNo,"违约重拍处理开始。。")
+
+		stmt = "SELECT * FROM au_order WHERE car_id= ? ORDER BY order_id DESC limit 1"
+		row = db.QueryRow(stmt,carId)
+		err = row.Scan(&biddingBestPrice,&bidBestPrice,&biddingBestDealerId,&bidBestPrice,&bidBestDealerId,&firstMoney)
+		if err != nil {
+			if err == sql.ErrNoRows{
+				log.Println()
+			}else{
+				log.Fatalf("SELECT * FROM au_order WHERE car_id= ? ORDER BY order_id DESC limit 1 %v %v",oid,err)
+			}
+		}
+		if biddingBestPrice > bidBestPrice {
+			bestPrice = biddingBestPrice
+			successDealerId = biddingBestDealerId
+		}else{
+			bestPrice = bidBestPrice
+			successDealerId = bidBestDealerId
+		}
+
+		stmt, _ := tx.Prepare("UPDATE au_order SET status = ? , success_price = ?, success_dealer_id = ?, first_money = ?, confirm_type = ?")
+		stmt.Exec(5,bestPrice,successDealerId,firstMoney,1)
+
+		log.Println(oid,"-",orderNo,"违约重拍处理结束。")
+	}
+}
+
 //处理自收重拍
-func SelfReceiveRedo(id int){
+func SelfReceiveRedo(order order,car car,tx *sql.Tx){
+
+	var (
+		isSelfReceive int
+	)
+
+	stmt, _ := tx.Prepare("UPDATE `cars` SET `is_self_receive` = ?,self_receive_dealer_id=? WHERE `car_id` = ?")
+	stmt.Exec(car.isSelfReceive,car.SelfReceiveDealerId,car.CarId)
+
+	//拍单是否自收重拍
+
+	if isSelfReceive == 1{
+
+	}else{
+
+	}
 	//global $db;
 	//$order = $db->where('order_id', $id)->getOne('order');
 	//$car = $db->where('car_id', $order['car_id'])->getOne('cars');
 	////拍单是否自收重拍
 	//$success_dealer_id = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_dealer_id'] : $order['bid_best_dealer_id'];
 	//if ($car['is_self_receive'] == 1) {
-	//echo $order['order_id'] . " - " . $order['order_no'] . "自收重拍处理\n";
-	//$best_price = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_price'] : $order['bid_best_price'];
-	////判断车辆来源
-	//$data = [];
-	//$data['status'] = 5;
-	//$data['success_price'] = $best_price;
-	//$data['success_dealer_id'] = $success_dealer_id;
-	//$data['confirm_type'] = 1;
-	//$db->where('order_id', $id)->update('order', $data);
+		//echo $order['order_id'] . " - " . $order['order_no'] . "自收重拍处理\n";
+		//$best_price = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_price'] : $order['bid_best_price'];
+		////判断车辆来源
+		//$data = [];
+		//$data['status'] = 5;
+		//$data['success_price'] = $best_price;
+		//$data['success_dealer_id'] = $success_dealer_id;
+		//$data['confirm_type'] = 1;
+		//$db->where('order_id', $id)->update('order', $data);
 	//} else {
-	////自收人拍得非违约重拍的车辆，才打上自收标签
-	//if ($car['is_dealer_breach'] == 0) {
-	//echo $order['order_id'] . " - " . $order['order_no'] . "自收人拍得车辆处理\n";
-	//$dealer = $db->where('dealer_id', $success_dealer_id)->getOne('car_dealer', 'dealer_type');
-	//if ($dealer['dealer_type'] == 1) {
-	//$db->where('car_id', $order['car_id'])->update('cars', [
-	//'is_self_receive' => 1,
-	//'self_receive_dealer_id' => $success_dealer_id
-	//]);
-	//}
-	//}
+		////自收人拍得非违约重拍的车辆，才打上自收标签
+		//if ($car['is_dealer_breach'] == 0) {
+			//echo $order['order_id'] . " - " . $order['order_no'] . "自收人拍得车辆处理\n";
+			//$dealer = $db->where('dealer_id', $success_dealer_id)->getOne('car_dealer', 'dealer_type');
+			//if ($dealer['dealer_type'] == 1) {
+				//$db->where('car_id', $order['car_id'])->update('cars', [
+				//'is_self_receive' => 1,
+				//'self_receive_dealer_id' => $success_dealer_id
+				//]);
+			//}
+		//}
 	//}
 }
 
-func update_trace_log(orderId int){
-
-	stmt := "SELECT `car_id` FROM `au_order` WHERE `order_id` = ? LIMIT 1"
-	rows := db.QueryRow(stmt,orderId)
-	var car_id int
-	err := rows.Scan(&car_id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Println("找不到车源 car_id:",car_id)
-		} else {
-			log.Fatalf("SELECT `car_id` FROM `au_order` WHERE `order_id` = %d exec failed: %v ", orderId,err)
-		}
-	}
-
-	tx, err := db.Begin()
-	if err != nil {
-		log.Fatalf("update_trace_log mysql transaction begin failed: %v ", err)
-	}
-	defer tx.Rollback()
-
-	stmtl, _ := tx.Prepare("INSERT INTO `au_order_trace_log_list`(`order_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
-	stmtl.Exec(orderId, order.CarId, "--", 1007, "开始竞拍", time.Now().UnixNano())
-
-
-	//$now = microtime_time();
-	//$orderInfo = $db->where('order_id', $id)->getOne('order','car_id');
-	//$db->insert('order_trace_log_list',[
-	//'order_id' => $id,
-	//'car_id'   => $orderInfo['car_id'],
-	//'emp_name' => '--',
-	//'action_no' => 1008,
-	//'action_name' => '竞拍结束',
-	//'createtime' => $now
-	//]);
-	//$carInfo = $db->where('car_id', $orderInfo['car_id'])->getOne('cars','owner_id,sid');
-	//$db->insert('car_trace_log_list',[
-	//'owner_id'   => $carInfo['owner_id'],
-	//'car_id' => $orderInfo['car_id'],
-	//'emp_name' => '--',
-	//'action_no' => 1014,
-	//'action_name' => '竞拍结束',
-	//'createtime' =>$now
-	//]);
-
-}
-
-//更新车源状态
-func update_car_source(sid int){
-
-	stmt := "SELECT `status` FROM `au_car_source` WHERE `sid` = ? LIMIT 1"
-	rows := db.QueryRow(stmt, sid)
-
-	var status int
-	err := rows.Scan(&status)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Println("找不到车源sid:",sid)
-		} else {
-			log.Fatalf("select status from  au_car_source where sid= %d 543 mysql fetch result failed: %v ", sid,err)
-		}
-	}
-
-	if status == 200 {
-		stmt = "UPDATE `au_car_source` SET `status` = 300 WHERE `sid` = ?"
-		_, err := db.Exec(stmt, sid)
-		if err != nil {
-			log.Printf("UPDATE `au_car_source` SET `status` = 300 WHERE `sid` = %d exec failed: %v \n", sid,err)
-		}
-		fmt.Printf("更新车源 %d 状态为300 待确认\n", sid)
-	}
-}
-func del_autobidding_redis_key(orderId int){
+func cleanAutobidding(orderId int){
 
 	conn := pool.Get()
 	defer conn.Close()
