@@ -303,7 +303,7 @@ func orderEnd(od order) {
 			breachRedoPlatform(od,car,tx)
 
 			//处理自收重拍
-			SelfReceiveRedo(od,car,tx)
+			SelfReceiveRedo(od.OrderId,car,tx)
 
 			errc := tx.Commit()
 			if errc != nil {
@@ -366,8 +366,10 @@ func breachRedoPlatform(order order,car car,tx *sql.Tx){
 	if car.IsDealerBreach == 1  {
 		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理开始。。")
 
+		//获取上一个拍单首付款信息
 		var firtMoney float64
-		row := db.QueryRow("SELECT first_money FROM `au_order` WHERE `car_id`=? ORDER BY order_id DESC limit 1,1")
+		stmt := "SELECT first_money FROM `au_order` WHERE `car_id`=? ORDER BY order_id DESC limit 1,1"
+		row := db.QueryRow(stmt,car.CarId)
 		err := row.Scan(&firtMoney)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -377,19 +379,22 @@ func breachRedoPlatform(order order,car car,tx *sql.Tx){
 			}
 		}
 
-		stmt, _ := tx.Prepare("UPDATE au_order SET first_money=?,confirm_type = ? WHERE order_id = ?")
-		stmt.Exec(1,firtMoney,order.OrderId)
+		stmt1, _ := tx.Prepare("UPDATE au_order SET first_money=?,confirm_type = ? WHERE order_id = ?")
+		stmt1.Exec(1,firtMoney,order.OrderId)
 
 		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理结束。。")
 	}
 }
 
 //处理自收重拍
-func SelfReceiveRedo(order order,car car,tx *sql.Tx){
+func SelfReceiveRedo(orderId int,car car,tx *sql.Tx){
 
 	var (
 		dealerType int
 	)
+
+	//获取拍单信息
+	order := getOrder(orderId)
 
 	//拍单是否是自收重拍
 	if car.isSelfReceive == 1{
@@ -401,19 +406,20 @@ func SelfReceiveRedo(order order,car car,tx *sql.Tx){
 	}else{
 		//自收人拍得非违约重拍的车辆，才打上自收标签
 		if car.IsDealerBreach == 0{
-			fmt.Println(order.OrderId , " - " , order.OrderNo , "自收人拍得车辆处理。。。")
 
 			stmt  :=  "SELECT dealer_type FROM au_car_dealer WHERE dealer_id=? limit 1"
 			row := db.QueryRow(stmt,order.SuccessDealerId)
 			err := row.Scan(&dealerType)
 			if err != nil {
 				if err == sql.ErrNoRows{
-					log.Println("找不到车商信息 dealer_id=",order.SuccessDealerId)
+					log.Println("自收车商查询无信息 dealer_id=",order.SuccessDealerId,order)
 				}else{
 					log.Fatalf("SELECT dealer_type FROM au_car_dealer WHERE dealer_id= %d limit 1 err: %v",order.SuccessDealerId,err)
 				}
 			}
 			if dealerType ==1 {
+				fmt.Println(order.OrderId , " - " , order.OrderNo , "自收人拍得车辆处理。。。")
+
 				stmt,_ := tx.Prepare("UPDATE au_cars SET is_self_receive = ?,self_receive_dealer_id = ? where car_id = ?")
 				stmt.Exec(car.isSelfReceive,car.SelfReceiveDealerId,car.CarId)
 			}

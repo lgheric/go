@@ -283,17 +283,18 @@ func getOrder(oid int) (od order) {
 	stmt := "SELECT order_id, order_no, scene_id, car_id, status, rank, is_timing_order, " +
 		"bid_start_time, bidding_start_time, bidding_end_time, est_elapsed_time, " +
 		"act_elapsed_time, bidding_best_dealer_id, bid_best_dealer_id, bidding_best_price, " +
-		"bid_best_price, first_money, success_price, company_subsidies, tail_money " +
+		"bid_best_price, first_money, success_price, company_subsidies, tail_money ,success_dealer_id " +
 		"FROM au_order WHERE order_id = ? "
 	rows := db.QueryRow(stmt, oid)
 	err := rows.Scan(&od.OrderId, &od.OrderNo, &od.SceneId, &od.CarId, &od.Status, &od.Rank,
 		&od.IsTimingOrder, &od.BidStartTime, &od.BiddingStartTime, &od.BiddingEndTime,
 		&od.EstElapsedTime, &od.ActElapsedTime, &od.BiddingBestDealerId, &od.BidBestDealerId, &od.BiddingBestPrice,
-		&od.BidBestPrice, &od.FirstMoney, &od.SuccessPrice, &od.CompanySubsidies, &od.TailMoney)
+		&od.BidBestPrice, &od.FirstMoney, &od.SuccessPrice, &od.CompanySubsidies, &od.TailMoney,&od.SuccessDealerId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Printf("%d can't find order", oid)
 		} else {
+			log.Printf("stmt:%s", stmt)
 			log.Fatalf("getOrder 298 mysql fetch result failed: %v ", err)
 		}
 	}
