@@ -64,6 +64,7 @@ type order struct {
 	BidBestPrice        float64 // 投标阶段最高价
 	FirstMoney          float64 // 应付首款
 	SuccessPrice        float64 // 成交价格
+	SuccessDealerId     int // 第一名
 	CompanySubsidies    float64 // 公司补贴
 	TailMoney           float64 // 应付尾款
 }
@@ -74,7 +75,7 @@ type car struct {
 	Sid		int
 	Sno		string
 	OwnerId        int
-	IsDealerBreach bool // 是否车商违约(0否1是)
+	IsDealerBreach int // 是否车商违约(0否1是)
 	CarSource      int  // 车辆来源(1,4S店 2,个人)
 	PayStatus      int  // 付款状态：-1 付款关闭 1、待付首款 2、已付首款 3、待付尾款 4、已付尾款
 	DeliveryMode   int  // 交付模式(1先付款后验车,2先验车后付款)

@@ -402,3 +402,19 @@ hammer_end_list_1486722780 queue pop {"order_id":2687,"scene_id":2582,"bidding_s
 开始结束订单: 2687 
 2582 : 定时拍单P1702100004竞拍结束 
 场次 2582 结束 
+2017/02/14 14:21:32 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/14 14:21:32 [CLCW Order SERVER] Biz Init Finished.
+2017/02/14 14:46:54 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/14 14:46:54 [CLCW Order SERVER] Biz Init Finished.
+2017/02/14 14:47:20 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/14 14:47:20 [CLCW Order SERVER] Biz Init Finished.
+运行参数:  start 0
+2017/02/14 14:47:26 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/14 14:47:26 [CLCW Order SERVER] Biz Init Finished.
+运行参数:  end 0
+2017/02/14 14:49:05 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/14 14:49:05 [CLCW Order SERVER] Biz Init Finished.
+运行参数:  start 0
+2017/02/14 14:49:12 dbuser:123456@tcp(192.168.1.115:3306)/aums?charset=utf8
+2017/02/14 14:49:12 [CLCW Order SERVER] Biz Init Finished.
+运行参数:  end 0

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"database/sql"
-	"os/exec"
 )
 
 // 处理开始时间的队列
@@ -301,13 +300,10 @@ func orderEnd(od order) {
 			updateCarSource(car,tx)
 
 			//处理违约重拍 -- 到平台确认
-			breachRedoPlatform(od.OrderId,tx)
+			breachRedoPlatform(od,car,tx)
 
 			//处理自收重拍
 			SelfReceiveRedo(od,car,tx)
-
-			//TODO 稍后修改下运营平台，auction 给redis加上2天有效期，之后此处代码删除
-			//cleanAutobidding(od.OrderId)
 
 			errc := tx.Commit()
 			if errc != nil {
@@ -365,72 +361,26 @@ func updateCarSource(car car,tx *sql.Tx) {
 }
 
 //处理违约重拍 -- 到平台确认
-func breachRedoPlatform(oid int,tx *sql.Tx){
-	stmt := "SELECT * FROM au_order WHERE order_id= ? "
-	row := db.QueryRow(stmt,oid)
-	var (
-		orderNo string
-		carId int
+func breachRedoPlatform(order order,car car,tx *sql.Tx){
 
-		isDealerBreach int
+	if car.IsDealerBreach == 1  {
+		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理开始。。")
 
-		biddingBestPrice float64
-		biddingBestDealerId int
-
-		bidBestPrice float64
-		bidBestDealerId int
-
-		firstMoney float64
-
-		bestPrice float64
-		successDealerId int
-	)
-
-	err := row.Scan(&orderNo,&carId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Println("找不到拍单 order_id:",oid)
-		} else {
-			log.Fatalf("SELECT * FROM `au_order` WHERE `order_id` = %d exec failed: %v ", oid,err)
-		}
-	}
-
-	stmt = "SELECT * FROM au_cars WHERE car_id= ? "
-	row = db.QueryRow(stmt,carId)
-	err = row.Scan(&isDealerBreach)
-	if err != nil {
-		if err == sql.ErrNoRows{
-			log.Println("找不到拍单 car_id:",carId)
-		}else{
-			log.Printf("SELECT * FROM `au_cars` WHERE `car_id` = %d exec failed: %v ", carId,err)
-		}
-	}
-
-	if isDealerBreach == 1{
-		log.Println(oid,"-",orderNo,"违约重拍处理开始。。")
-
-		stmt = "SELECT * FROM au_order WHERE car_id= ? ORDER BY order_id DESC limit 1"
-		row = db.QueryRow(stmt,carId)
-		err = row.Scan(&biddingBestPrice,&bidBestPrice,&biddingBestDealerId,&bidBestPrice,&bidBestDealerId,&firstMoney)
+		var firtMoney float64
+		row := db.QueryRow("SELECT first_money FROM `au_order` WHERE `car_id`=? ORDER BY order_id DESC limit 1,1")
+		err := row.Scan(&firtMoney)
 		if err != nil {
-			if err == sql.ErrNoRows{
-				log.Println()
+			if err == sql.ErrNoRows {
+				log.Println("根据car_id未找到之前的拍单:",order.CarId)
 			}else{
-				log.Fatalf("SELECT * FROM au_order WHERE car_id= ? ORDER BY order_id DESC limit 1 %v %v",oid,err)
+				log.Fatalf("order.go line 380 sql query row. sql: %d err: %v",order.OrderId,err)
 			}
 		}
-		if biddingBestPrice > bidBestPrice {
-			bestPrice = biddingBestPrice
-			successDealerId = biddingBestDealerId
-		}else{
-			bestPrice = bidBestPrice
-			successDealerId = bidBestDealerId
-		}
 
-		stmt, _ := tx.Prepare("UPDATE au_order SET status = ? , success_price = ?, success_dealer_id = ?, first_money = ?, confirm_type = ?")
-		stmt.Exec(5,bestPrice,successDealerId,firstMoney,1)
+		stmt, _ := tx.Prepare("UPDATE au_order SET first_money=?,confirm_type = ? WHERE order_id = ?")
+		stmt.Exec(1,firtMoney,order.OrderId)
 
-		log.Println(oid,"-",orderNo,"违约重拍处理结束。")
+		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理结束。。")
 	}
 }
 
@@ -438,91 +388,36 @@ func breachRedoPlatform(oid int,tx *sql.Tx){
 func SelfReceiveRedo(order order,car car,tx *sql.Tx){
 
 	var (
-		isSelfReceive int
+		dealerType int
 	)
 
-	stmt, _ := tx.Prepare("UPDATE `cars` SET `is_self_receive` = ?,self_receive_dealer_id=? WHERE `car_id` = ?")
-	stmt.Exec(car.isSelfReceive,car.SelfReceiveDealerId,car.CarId)
+	//拍单是否是自收重拍
+	if car.isSelfReceive == 1{
+		fmt.Println(order.OrderId , " - " , order.OrderNo , "自收重拍处理。。。")
 
-	//拍单是否自收重拍
-
-	if isSelfReceive == 1{
+		stmt,_ := tx.Prepare("UPDATE au_order set confirm_type=? where order_id = ?")
+		stmt.Exec(1,order.OrderId)
 
 	}else{
+		//自收人拍得非违约重拍的车辆，才打上自收标签
+		if car.IsDealerBreach == 0{
+			fmt.Println(order.OrderId , " - " , order.OrderNo , "自收人拍得车辆处理。。。")
 
-	}
-	//global $db;
-	//$order = $db->where('order_id', $id)->getOne('order');
-	//$car = $db->where('car_id', $order['car_id'])->getOne('cars');
-	////拍单是否自收重拍
-	//$success_dealer_id = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_dealer_id'] : $order['bid_best_dealer_id'];
-	//if ($car['is_self_receive'] == 1) {
-		//echo $order['order_id'] . " - " . $order['order_no'] . "自收重拍处理\n";
-		//$best_price = $order['bidding_best_price'] > $order['bid_best_price'] ? $order['bidding_best_price'] : $order['bid_best_price'];
-		////判断车辆来源
-		//$data = [];
-		//$data['status'] = 5;
-		//$data['success_price'] = $best_price;
-		//$data['success_dealer_id'] = $success_dealer_id;
-		//$data['confirm_type'] = 1;
-		//$db->where('order_id', $id)->update('order', $data);
-	//} else {
-		////自收人拍得非违约重拍的车辆，才打上自收标签
-		//if ($car['is_dealer_breach'] == 0) {
-			//echo $order['order_id'] . " - " . $order['order_no'] . "自收人拍得车辆处理\n";
-			//$dealer = $db->where('dealer_id', $success_dealer_id)->getOne('car_dealer', 'dealer_type');
-			//if ($dealer['dealer_type'] == 1) {
-				//$db->where('car_id', $order['car_id'])->update('cars', [
-				//'is_self_receive' => 1,
-				//'self_receive_dealer_id' => $success_dealer_id
-				//]);
-			//}
-		//}
-	//}
-}
-
-func cleanAutobidding(orderId int){
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	if _, err := conn.Do("SELECT", 4); err != nil {
-		log.Fatalf("Redis 选择库失败。Err:  %s ", err)
-		return
-	}
-	//autobidding_order_list
-	queueName := conf.Redis.AutoOrderLs + string(orderId)
-	_, err := redis.String(conn.Do("srem", queueName))
-	if err != nil {
-		fmt.Printf("%s queue srem failed: %s ", queueName, err)
-	}
-
-	//删除所有设置智能出价的车商
-	//autobidding_dealer_list_拍单ID
-	queueName = conf.Redis.AutoDealerLs + string(orderId)
-	_, err = redis.String(conn.Do("del", queueName))
-	if err != nil {
-		fmt.Printf("%s queue del failed: %s ", queueName, err)
-	}
-
-	//autobidding_dealer_info_拍单ID_*
-	queueName = conf.Redis.AutoDealerIf + string(orderId)+"_*"
-	cmd := exec.Command("`which sh`", "-c", "`redis-cli keys"+ queueName +"|xargs redis-cli del`")
-	_, err = cmd.StdoutPipe()
-	if err != nil {
-		fmt.Println(queueName,"删除失败。","错误: " + err.Error())
-	}
-
-	//autobidding_order_info_拍单ID
-	queueName = conf.Redis.AutoOrderIf + string(orderId)
-	_, err = redis.String(conn.Do("del", queueName))
-	if err != nil {
-		fmt.Printf("%s queue del failed: %s ", queueName, err)
-	}
-	//autobidding_order_bidding_拍单ID
-	queueName = conf.Redis.AutoOrderBi + string(orderId)
-	_, err = redis.String(conn.Do("del", queueName))
-	if err != nil {
-		fmt.Printf("%s queue del failed: %s ", queueName, err)
+			stmt  :=  "SELECT dealer_type FROM au_car_dealer WHERE dealer_id=? limit 1"
+			row := db.QueryRow(stmt,order.SuccessDealerId)
+			err := row.Scan(&dealerType)
+			if err != nil {
+				if err == sql.ErrNoRows{
+					log.Println("找不到车商信息 dealer_id=",order.SuccessDealerId)
+				}else{
+					log.Fatalf("SELECT dealer_type FROM au_car_dealer WHERE dealer_id= %d limit 1 err: %v",order.SuccessDealerId,err)
+				}
+			}
+			if dealerType ==1 {
+				stmt,_ := tx.Prepare("UPDATE au_cars SET is_self_receive = ?,self_receive_dealer_id = ? where car_id = ?")
+				stmt.Exec(car.isSelfReceive,car.SelfReceiveDealerId,car.CarId)
+			}
+		}
 	}
 }
+
