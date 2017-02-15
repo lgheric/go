@@ -38,7 +38,7 @@ func orderStartHandle(res string) {
 	order := &StartOrderQueue{}
 	err := json.Unmarshal([]byte(res), &order)
 	if err != nil {
-		log.Fatalf("json",res,"解析失败", err)
+		log.Fatalf("Json: %s 解析失败:%v",res, err)
 	}
 
 	if order.SceneID == 0 || order.OrderID == 0 {
@@ -52,7 +52,7 @@ func orderStartHandle(res string) {
 	//获取场redis key
 	count, err := redis.Int(conn.Do("SCARD", conf.Redis.Scene+fmt.Sprintf("%d", order.SceneID)))
 	if err != nil {
-		log.Fatalf("json %s failed: %v \n", err)
+		log.Fatalf("Redis Command:SCARD %s %d 发生致命错误：%v \n", conf.Redis.Scene,order.SceneID,err)
 	}
 
 	fmt.Printf("scene_id : %d scard : %d \n", order.SceneID, count)
@@ -63,7 +63,7 @@ func orderStartHandle(res string) {
 			orderWaitBidding(oids, order.SceneID)
 			sceneSaddOrder(oids, order.SceneID)
 		} else {
-			fmt.Printf("%d 会场没有status = 3订单", order.SceneID)
+			fmt.Printf("场%d 没有待投标的订单", order.SceneID)
 			return
 		}
 	}
@@ -109,7 +109,7 @@ func orderEndHandle(res string) {
 	eod := &EndOrderQueue{}
 	err := json.Unmarshal([]byte(res), &eod)
 	if err != nil {
-		log.Fatalf("json %s failed: %v \n", res, err)
+		log.Fatalf("Json %s 解析 failed: %v \n", res, err)
 	}
 
 	order := getOrder(eod.OrderID)

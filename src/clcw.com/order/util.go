@@ -204,13 +204,12 @@ func sceneSaddOrder(oids []int, sid int) {
 	defer conn.Close()
 
 	for _, v := range oids {
+		//fmt.Printf("Redis command:SADD %s %d \n",conf.Redis.Scene+fmt.Sprintf("%d", sid),v)
 		bool, err := redis.Bool(conn.Do("SADD", conf.Redis.Scene+fmt.Sprintf("%d", sid), v))
-		if err != nil {
-			log.Fatalf("%s :scene set error order : %s %v ", sid, v, err)
+		if err != nil || !bool {
+			log.Fatalf("sid:%d v:%v err:%v bool:%v \n", sid, v, err,bool)
 		}
-		if !bool {
-			log.Fatalf("%s :scene set error order %s : %v ", sid, v, err)
-		}
+		conn.Do("EXPIRE", conf.Redis.Scene+fmt.Sprintf("%d", sid),conf.Redis.Timeout)
 	}
 }
 
