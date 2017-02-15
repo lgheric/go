@@ -173,11 +173,27 @@ func formatTime(dateStr string) (s int64, err error) {
  * @param int sid 场次ID
  */
 func sceneStart(sid int) {
-	_, err := db.Exec("UPDATE `au_order_scene` SET `status` = 2 WHERE `scene_id` = ?", sid)
+	var status int
+	stmt := "SELECT status FROM au_order_scene WHERE scene_id = ?"
+	row := db.QueryRow(stmt,sid)
+	err := row.Scan(&status)
 	if err != nil {
-		log.Printf("mysql exec failed: %v \n", err)
+		if err == sql.ErrNoRows {
+			log.Fatalf("没找到场 %d",sid)
+		}else{
+			log.Fatalf("获取场信息失败:stmt= %s %d",stmt,sid)
+		}
 	}
-	fmt.Printf("场次 %d 开始 \n", sid)
+	if status ==1 {
+		stmt := "UPDATE `au_order_scene` SET `status` = 2 WHERE `scene_id` = ?"
+		_, err := db.Exec(stmt, sid)
+		if err != nil {
+			log.Printf("Mysql exec failed: %v \n", err)
+			log.Printf("Stmt: %s \n", stmt)
+		}
+		fmt.Printf("场次 %d 开始 \n", sid)
+
+	}
 }
 
 /**
@@ -186,11 +202,22 @@ func sceneStart(sid int) {
  * @param int sid 场次ID
  */
 func sceneEnd(sid int) {
-	_, err := db.Exec("UPDATE `au_order_scene` SET `status` = 3, `endtime` = now() WHERE `scene_id` = ?", sid)
-	if err != nil {
-		log.Printf("mysql exec failed: %v \n", err)
+	//判断场内是否还有拍单
+	var count int
+	stmt := "SELECT COUNT(*) FROM au_order WHERE scene_id = ? AND status in(3,301,4)"
+	row := db.QueryRow(stmt,sid)
+	err := row.Scan(&count)
+	if err == nil {
+		if count <=0 {
+			_, err := db.Exec("UPDATE `au_order_scene` SET `status` = 3, `endtime` = now() WHERE `scene_id` = ?", sid)
+			if err != nil {
+				log.Printf("mysql exec failed: %v \n", err)
+			}
+			fmt.Printf("场次 %d 结束 \n", sid)
+		}
+	}else{
+		log.Fatalf("致命错误：%v stmt:%s",err,stmt)
 	}
-	fmt.Printf("场次 %d 结束 \n", sid)
 }
 
 /**
@@ -203,13 +230,14 @@ func sceneSaddOrder(oids []int, sid int) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	for _, v := range oids {
-		//fmt.Printf("Redis command:SADD %s %d \n",conf.Redis.Scene+fmt.Sprintf("%d", sid),v)
-		bool, err := redis.Bool(conn.Do("SADD", conf.Redis.Scene+fmt.Sprintf("%d", sid), v))
+	for _, oid := range oids {
+
+		bool, err := redis.Bool(conn.Do("SADD", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid))
 		if err != nil || !bool {
-			log.Fatalf("sid:%d v:%v err:%v bool:%v \n", sid, v, err,bool)
+			log.Printf("Redis SADD %s %d 命令执行失败。 err:%v \n", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid,err)
+		}else{
+			log.Printf("Redis SADD %s %d 命令执行成功！ \n", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid)
 		}
-		conn.Do("EXPIRE", conf.Redis.Scene+fmt.Sprintf("%d", sid),conf.Redis.Timeout)
 	}
 }
 
@@ -238,10 +266,12 @@ func orderWaitBidding(oids []int, sid int) {
 	for _, v := range oids {
 		ids = append(ids, strconv.Itoa(v))
 	}
-	stmt := fmt.Sprintf("UPDATE `au_order` SET `status` = 301 WHERE `order_id` in (%s)", strings.Join(ids, ","))
+	//stmt := fmt.Sprintf("UPDATE `au_order` SET `status` = 301 WHERE `order_id` in (%s)", strings.Join(ids, ","))
+	stmt := fmt.Sprintf("UPDATE `au_order` SET `status` = 301 WHERE status=3 AND `scene_id` = %d", sid)
+	fmt.Printf("DEBUG:%s \n",stmt)
 	_, err := db.Exec(stmt)
 	if err != nil {
-		log.Printf("in util line 139 mysql exec failed: %v \n", err)
+		log.Printf("Mysql exec failed on util line 139 : %v \n", err)
 	}
 
 	fmt.Printf("|%d|:场内全部拍单列表:%s \n", sid, strings.Join(ids, ","))
@@ -257,14 +287,14 @@ func getOrderList(sid int) (oids []int) {
 	oid := 0
 	rows, err := db.Query("SELECT order_id FROM au_order WHERE scene_id = ? AND status = 3 ORDER BY rank ASC", sid)
 	if err != nil {
-		log.Printf("in util line 149 mysql query failed: %v \n", err)
+		log.Printf("In util line 149 mysql query failed: %v \n", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		err := rows.Scan(&oid)
 		if err != nil {
-			log.Fatalf("in util line 156 mysql fetch result failed: %v ", err)
+			log.Fatalf("In util line 156 mysql fetch result failed: %v ", err)
 		}
 		oids = append(oids, oid)
 	}
@@ -661,5 +691,105 @@ func bindingCard(cid int, oid int) {
 	_, err := db.Exec("UPDATE `au_scratch_card` SET `order_id` = ? WHERE `cid` = ?", oid, cid)
 	if err != nil {
 		log.Printf("bindingCard 643 mysql exec failed: %v \n", err)
+	}
+}
+
+//更新拍单进度状态
+func updateTraceLog(od order,car car,tx *sql.Tx){
+
+	stmtl, _ := tx.Prepare("INSERT INTO `au_order_trace_log_list`(`order_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
+	stmtl.Exec(od.OrderId, od.CarId, "--", 1008, "竞拍结束", time.Now().UnixNano())
+
+	stmtc, _ := tx.Prepare("INSERT INTO `au_car_trace_log_list`(`owner_id`, `car_id`, `emp_name`, `action_no`, `action_name`, `createtime`) VALUES (?, ?, ?, ?, ?, ?)")
+	stmtc.Exec(car.OwnerId, car.CarId, "--", 1014, "竞拍结束", time.Now().UnixNano())
+
+}
+
+//更新车源状态
+func updateCarSource(car car,tx *sql.Tx) {
+
+	stmt := "SELECT `status` FROM `au_car_source` WHERE `sid` = ? LIMIT 1"
+	rows := db.QueryRow(stmt, car.Sid)
+
+	var status int
+	err := rows.Scan(&status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("找不到车源sid:",car.Sid)
+		} else {
+			log.Printf("select status from  au_car_source where sid= %d 543 mysql fetch result failed: %v ", car.Sid,err)
+		}
+	}
+
+	if status == 200 {
+		stmt, _ := tx.Prepare("UPDATE `au_car_source` SET `status` = 300 WHERE `sid` = ?")
+		stmt.Exec(car.Sid)
+
+		fmt.Printf("更新车源 %d 状态为300 待确认\n", car.Sid)
+	}
+
+}
+
+//处理违约重拍 -- 到平台确认
+func breachRedoPlatform(order order,car car,tx *sql.Tx){
+
+	if car.IsDealerBreach == 1  {
+		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理开始。。")
+
+		//获取上一个拍单首付款信息
+		var firtMoney float64
+		stmt := "SELECT first_money FROM `au_order` WHERE `car_id`=? ORDER BY order_id DESC limit 1,1"
+		row := db.QueryRow(stmt,car.CarId)
+		err := row.Scan(&firtMoney)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Println("根据car_id未找到之前的拍单:",order.CarId)
+			}else{
+				log.Fatalf("order.go line 380 sql query row. sql: %d err: %v",order.OrderId,err)
+			}
+		}
+
+		stmt1, _ := tx.Prepare("UPDATE au_order SET first_money=?,confirm_type = ? WHERE order_id = ?")
+		stmt1.Exec(1,firtMoney,order.OrderId)
+
+		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理结束。。")
+	}
+}
+
+//处理自收重拍
+func SelfReceiveRedo(orderId int,car car,tx *sql.Tx){
+
+	var (
+		dealerType int
+	)
+
+	//获取拍单信息
+	order := getOrder(orderId)
+	//拍单是否是自收重拍
+	if car.isSelfReceive == 1{
+		fmt.Println(order.OrderId , " - " , order.OrderNo , "自收重拍处理。。。")
+
+		stmt,_ := tx.Prepare("UPDATE au_order set confirm_type=? where order_id = ?")
+		stmt.Exec(1,order.OrderId)
+
+	}else{
+		//自收人拍得非违约重拍的车辆，才打上自收标签
+		if car.IsDealerBreach == 0 {
+
+			stmt  :=  "SELECT dealer_type FROM au_car_dealer WHERE dealer_id=? limit 1"
+			row := db.QueryRow(stmt,order.SuccessDealerId)
+			err := row.Scan(&dealerType)
+			if err != nil {
+				if err != sql.ErrNoRows {
+					log.Fatalf("stmt:%s %d err: %v",stmt,order.SuccessDealerId,err)
+				}
+			}
+			if dealerType ==1 {
+				fmt.Println(order.OrderId , " - " , order.OrderNo , "自收人拍得车辆处理。。。")
+
+				stmt,_ := tx.Prepare("UPDATE au_cars SET is_self_receive = ?,self_receive_dealer_id = ? where car_id = ?")
+				stmt.Exec(car.isSelfReceive,car.SelfReceiveDealerId,car.CarId)
+			}
+		}
 	}
 }
