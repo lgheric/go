@@ -745,7 +745,6 @@ func breachRedoPlatform(order order,car car,tx *sql.Tx){
 		stmt1, _ := tx.Prepare("UPDATE au_order SET first_money=?,confirm_type = ? WHERE order_id = ?")
 		stmt1.Exec(1,firtMoney,order.OrderId)
 
-		log.Println(order.OrderId,"-",order.OrderNo,"违约重拍处理结束。。")
 	}
 }
 
