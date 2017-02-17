@@ -33,6 +33,11 @@ type logConf struct {
 	File string
 }
 
+type pprofConf struct {
+	Host string
+	Port string
+}
+
 type feeConf struct {
 	Percentage float64
 	Minfee     int
@@ -44,6 +49,7 @@ type config struct {
 	Redis redisConf
 	Log   logConf
 	Fee   feeConf
+	Pprof	pprofConf
 }
 
 type order struct {

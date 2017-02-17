@@ -59,21 +59,21 @@ func main() {
 	//open doesn't open a connection.
 	db, err = sql.Open("mysql", mysql_dsn)
 	if err != nil {
-		log.Panic("[CLCW Order SERVER] mysql open dsn failed : %v", err)
+		log.Panicf("[CLCW Order SERVER] mysql open dsn failed : %v", err)
 	}
 	defer db.Close()
 	db.SetMaxOpenConns(MaxOpenDbConnect)
 
 	err = db.Ping() //check connection
 	if err != nil {
-		log.Panic("[CLCW Order SERVER] mysql connect failed : %v", err)
+		log.Panicf("[CLCW Order SERVER] mysql connect failed : %v", err)
 	}
 
 	log.Println("[CLCW Order SERVER] Biz Init Finished.")
 
 	//setup pprof
 	go func() {
-		http.ListenAndServe("192.168.1.115:6060", nil)
+		http.ListenAndServe(conf.Pprof.Host+":"+conf.Pprof.Port, nil)
 	}()
 
 	//setup command line
