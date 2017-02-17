@@ -19,6 +19,7 @@ scene = "hammer_scene_"
 dealerlock = "hammer_dealer_lock_"
 orderlock = "hammer_order_lock_"
 cardlock = "hammer_order_card"
+scenelock = "hammer_scene_lock_"
 timeout = 60
 
 
@@ -27,3 +28,10 @@ percentage = 0.01
 minfee = 300
 maxfee = 2000
 
+[pprof]
+host = "192.168.1.115"
+port = "6060"
+
+[thrift]
+host = "192.168.1.115"
+port = "80"

@@ -11,7 +11,7 @@ import (
 
 func thriftClient() {
 	startTime := currentTimeMillis()
-	url := "http://192.168.1.115:80/Bail/run"
+	url := "http://"+conf.Thrift.Host+":"+conf.Thrift.Port+"/Bail/run"
 
 	transport, err := thrift.NewTHttpPostClient(url)
 	if err != nil {

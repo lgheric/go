@@ -131,12 +131,12 @@ func redisLock(key string) (bool bool) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	bool, err := redis.Bool(conn.Do("SETNX", key, 1))
+	boola, err := redis.Bool(conn.Do("SETNX", key, 1))
 	if err != nil {
 		log.Fatalf("%s redis key lock failed: %v ", key, err)
 	}
 
-	if !bool {
+	if !boola {
 		time.Sleep(time.Second)
 		//redisLock(key)
 		bool, _ = redis.Bool(conn.Do("SETNX", key, 1))
@@ -232,8 +232,8 @@ func sceneSaddOrder(oids []int, sid int) {
 
 	for _, oid := range oids {
 
-		bool, err := redis.Bool(conn.Do("SADD", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid))
-		if err != nil || !bool {
+		boola, err := redis.Bool(conn.Do("SADD", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid))
+		if err != nil || !boola {
 			log.Printf("Redis SADD %s %d 命令执行失败。 err:%v \n", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid,err)
 		}else{
 			log.Printf("Redis SADD %s %d 命令执行成功！ \n", conf.Redis.Scene+fmt.Sprintf("%d", sid), oid)
@@ -428,7 +428,7 @@ func paimaiRefund(oid int, did int) {
  *
  */
 func updateGuarantee(oid int, title string, dbl *dealerBailLog) (err error) {
-
+	thriftClient()
 	var bailAmount float64
 	key := conf.Redis.Dealerlock + fmt.Sprintf("%d", dbl.dealerId)
 
@@ -569,7 +569,7 @@ func getRandPrice(card map[int]float64) (price float64) {
 		price     float64
 	}
 
-	for key, _ := range card {
+	for key := range card {
 		allNum = allNum + key
 	}
 	ta := make(map[int]tmp_a)

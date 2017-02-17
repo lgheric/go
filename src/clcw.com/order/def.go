@@ -38,6 +38,11 @@ type pprofConf struct {
 	Port string
 }
 
+type thriftConf struct {
+	Host string
+	Port string
+}
+
 type feeConf struct {
 	Percentage float64
 	Minfee     int
@@ -50,6 +55,7 @@ type config struct {
 	Log   logConf
 	Fee   feeConf
 	Pprof	pprofConf
+	Thrift	thriftConf
 }
 
 type order struct {
