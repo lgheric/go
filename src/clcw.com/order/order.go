@@ -56,16 +56,22 @@ func orderStartHandle(res string) {
 
 	fmt.Printf("scene_id : %d scard : %d \n", order.SceneID, count)
 	//场 Redis key不存在，则创建之
-	//几乎并发的协程，会导致当前时间的协程同时满足<=0条件
+	//几乎并发的协程，会导致当前时间的协程同时满足<=0条件,故加redis唯一锁
 	if count <= 0 {
-		oids := getOrderList(order.SceneID)
-		if len(oids) > 0 {
-			//场开始
-			sceneStart(order.SceneID)
-			//场内所有拍单状态改为301待竞拍
-			orderWaitBidding(oids, order.SceneID)
-			//场 Redis key
-			sceneSaddOrder(oids, order.SceneID)
+		//redis唯一锁
+		lockBool := redisLock(conf.Redis.Scenelock+fmt.Sprintf("%d",order.SceneID))
+		if lockBool {
+			//获取场内所有拍单
+			oids := getOrderList(order.SceneID)
+			if len(oids) > 0 {
+				//场开始
+				sceneStart(order.SceneID)
+				//场内所有拍单状态改为301待竞拍
+				orderWaitBidding(oids, order.SceneID)
+				//场 Redis key
+				sceneSaddOrder(oids, order.SceneID)
+			}
+			redisUnLock(conf.Redis.Scenelock+fmt.Sprintf("%d",order.SceneID))
 		}
 	}
 
@@ -303,7 +309,7 @@ func orderEnd(od order) {
 			//处理违约重拍 -- 到平台确认
 			breachRedoPlatform(od,car,tx)
 
-			//处理自收重拍
+			//处理自收及自收车重拍
 			SelfReceiveRedo(od.OrderId,car,tx)
 
 			errc := tx.Commit()

@@ -20,6 +20,7 @@ type redisConf struct {
 	Dealerlock string
 	Orderlock  string
 	Cardlock   string
+	Scenelock   string
 	Timeout    int
 	AutoOrderLs string
 	AutoOrderIf string
@@ -81,7 +82,7 @@ type car struct {
 	DeliveryMode   int  // 交付模式(1先付款后验车,2先验车后付款)
 	ThreeInOne     int  // 三证合一(1,是 2,否)
 	LocationArea   int  // 车辆所在地
-	isSelfReceive	int //是否自收车辆
+	IsSelfReceive	int //是否自收车辆
 	SelfReceiveDealerId int //自收车辆车商ID
 }
 

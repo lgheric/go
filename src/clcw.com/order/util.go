@@ -338,9 +338,9 @@ func getOrder(oid int) (od order) {
  */
 func getCar(cid int) (car car) {
 
-	stmt := "SELECT car_id,car_no,sid,sno,owner_id,is_dealer_breach,car_source,pay_status,delivery_mode,three_in_one,location_area FROM au_cars WHERE car_id = ? "
+	stmt := "SELECT car_id,car_no,sid,sno,owner_id,is_dealer_breach,car_source,pay_status,delivery_mode,three_in_one,location_area,is_self_receive FROM au_cars WHERE car_id = ? "
 	rows := db.QueryRow(stmt, cid)
-	err := rows.Scan(&car.CarId, &car.CarNo,&car.Sid,&car.Sno,&car.OwnerId, &car.IsDealerBreach, &car.CarSource, &car.PayStatus, &car.DeliveryMode, &car.ThreeInOne, &car.LocationArea)
+	err := rows.Scan(&car.CarId, &car.CarNo,&car.Sid,&car.Sno,&car.OwnerId, &car.IsDealerBreach, &car.CarSource, &car.PayStatus, &car.DeliveryMode, &car.ThreeInOne, &car.LocationArea,&car.IsSelfReceive)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Printf("%d can't find car", cid)
@@ -740,14 +740,7 @@ func breachRedoPlatform(order order,car car,tx *sql.Tx){
 		var firtMoney float64
 		stmt := "SELECT first_money FROM `au_order` WHERE `car_id`=? ORDER BY order_id DESC limit 1,1"
 		row := db.QueryRow(stmt,car.CarId)
-		err := row.Scan(&firtMoney)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				log.Println("根据car_id未找到之前的拍单:",order.CarId)
-			}else{
-				log.Fatalf("order.go line 380 sql query row. sql: %d err: %v",order.OrderId,err)
-			}
-		}
+		row.Scan(&firtMoney)
 
 		stmt1, _ := tx.Prepare("UPDATE au_order SET first_money=?,confirm_type = ? WHERE order_id = ?")
 		stmt1.Exec(1,firtMoney,order.OrderId)
@@ -766,7 +759,7 @@ func SelfReceiveRedo(orderId int,car car,tx *sql.Tx){
 	//获取拍单信息
 	order := getOrder(orderId)
 	//拍单是否是自收重拍
-	if car.isSelfReceive == 1{
+	if car.IsSelfReceive == 1{
 		fmt.Println(order.OrderId , " - " , order.OrderNo , "自收重拍处理。。。")
 
 		stmt,_ := tx.Prepare("UPDATE au_order set confirm_type=? where order_id = ?")
@@ -778,17 +771,13 @@ func SelfReceiveRedo(orderId int,car car,tx *sql.Tx){
 
 			stmt  :=  "SELECT dealer_type FROM au_car_dealer WHERE dealer_id=? limit 1"
 			row := db.QueryRow(stmt,order.SuccessDealerId)
-			err := row.Scan(&dealerType)
-			if err != nil {
-				if err != sql.ErrNoRows {
-					log.Fatalf("stmt:%s %d err: %v",stmt,order.SuccessDealerId,err)
-				}
-			}
+			row.Scan(&dealerType)
+
 			if dealerType ==1 {
 				fmt.Println(order.OrderId , " - " , order.OrderNo , "自收人拍得车辆处理。。。")
 
 				stmt,_ := tx.Prepare("UPDATE au_cars SET is_self_receive = ?,self_receive_dealer_id = ? where car_id = ?")
-				stmt.Exec(car.isSelfReceive,car.SelfReceiveDealerId,car.CarId)
+				stmt.Exec(1,order.SuccessDealerId,car.CarId)
 			}
 		}
 	}
