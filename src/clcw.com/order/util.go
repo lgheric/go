@@ -441,7 +441,7 @@ func updateGuarantee(oid int, title string, dbl *dealerBailLog) (err error) {
 				log.Fatalf("mysql transaction begin failed: %v ", err)
 			}
 			defer tx.Rollback()
-
+			//此处是为了防止select并发
 			_, err = tx.Exec("UPDATE `au_car_dealer` SET shortname=shortname WHERE `dealer_id` = ? LIMIT 1", dbl.dealerId)
 
 			rows := tx.QueryRow("SELECT `bail_amount` FROM `au_car_dealer` WHERE `dealer_id` = ?", dbl.dealerId)
@@ -463,7 +463,6 @@ func updateGuarantee(oid int, title string, dbl *dealerBailLog) (err error) {
 			redisUnLock(key)
 			fmt.Printf("车商：%d 冻结保证金解除 \n", dbl.dealerId)
 		}
-
 	} else {
 		time.Sleep(time.Second)
 		updateGuarantee(oid, title, dbl)

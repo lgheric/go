@@ -101,7 +101,8 @@ func main() {
 		}
 	} else if state == "test" {
 
-		//thriftClient()
+		thriftClient()
+
 		//v := RandInt64(1,10000001)
 		//fmt.Println(v)
 		//car1 := getCar(362)

@@ -33,5 +33,5 @@ host = "192.168.1.115"
 port = "6060"
 
 [thrift]
-host = "192.168.1.115"
+host = "auction.weaver.clcw.com.cn"
 port = "80"
