@@ -9,6 +9,6 @@ function demo(){
 }
 
 
-
-
+echo '老司机开车了';
+echo "123";
 ?>
