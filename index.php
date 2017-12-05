@@ -2,4 +2,5 @@
 
 echo hello word!;
 
+echo think;
 ?>
