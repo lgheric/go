@@ -1,2 +1,2 @@
 <?php
-echo 'bansiyu 修改';
+echo 'jinji 修改';
