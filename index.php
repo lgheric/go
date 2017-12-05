@@ -1,2 +1,2 @@
 <?php
-echo 1;
+echo 'bansiyu 修改';
