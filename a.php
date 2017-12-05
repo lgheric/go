@@ -5,7 +5,8 @@ echo "路过一下1";
 
 
 function demo(){
-  echo '...';
+	echo '...';
+	echo 'abc';
 
 }
 
