@@ -1,1 +1,1 @@
-echo '我是贲红宝。';
+echo 'hello';
